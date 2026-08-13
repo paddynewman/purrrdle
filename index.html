@@ -889,7 +889,10 @@
     const allowedWords = new Set(BRITISH_WORDS);
     const CELEBRATION_IMAGES = [
       "cat-01.jpeg", "cat-02.jpeg", "cat-03.jpeg", "cat-04.jpeg", "cat-05.jpeg", "cat-06.jpeg",
-      "cat-07.jpeg", "cat-08.jpeg", "cat-09.jpeg", "cat-10.jpeg", "cat-11.jpeg", "cat-12.jpeg", "cat-13.jpeg"
+      "cat-07.jpeg", "cat-08.jpeg", "cat-09.jpeg", "cat-10.jpeg", "cat-11.jpeg", "cat-12.jpeg", "cat-13.jpeg",
+      "cat-14.jpeg", "cat-15.jpeg", "cat-16.jpeg", "cat-17.jpeg", "cat-18.jpeg", "cat-19.jpeg",
+      "cat-20.jpeg", "cat-21.jpeg", "cat-22.jpeg", "cat-23.jpeg", "cat-24.jpeg", "cat-25.jpeg", "cat-26.jpeg",
+      "cat-27.jpeg", "cat-28.jpeg", "cat-29.jpeg"
     ];
 
     const STORAGE_PREFIX = "purrrdle-state-";
@@ -899,6 +902,13 @@
       const today = Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
       const dayCount = Math.floor((today - epoch) / (24 * 60 * 60 * 1000));
       return ((dayCount % BRITISH_WORDS.length) + BRITISH_WORDS.length) % BRITISH_WORDS.length;
+    }
+
+    function getCelebrationImageIndexForDate(date = new Date()) {
+      const epoch = Date.UTC(2024, 0, 1);
+      const today = Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
+      const dayCount = Math.floor((today - epoch) / (24 * 60 * 60 * 1000));
+      return ((dayCount % CELEBRATION_IMAGES.length) + CELEBRATION_IMAGES.length) % CELEBRATION_IMAGES.length;
     }
 
     function getTodayKey(date = new Date()) {
@@ -940,6 +950,7 @@
         const lastGuess = guesses[guesses.length - 1] || "";
         if (lastGuess === solution) {
           announce("You already solved today's Purrrdle.");
+          showCelebrationPopup();
           return;
         }
         announce(`Out of tries. The word was ${solution}.`);
@@ -950,12 +961,25 @@
       return BRITISH_WORDS[getWordIndexForDate()].toUpperCase();
     }
 
+    function getCelebrationTitle() {
+      const attempts = guesses.length;
+      if (attempts <= 1) return "Brilliant!";
+      if (attempts === 2) return "Excellent!";
+      if (attempts === 3) return "Well done!";
+      if (attempts === 4) return "Nice!";
+      if (attempts === 5) return "Got it!";
+      return "Phew!";
+    }
+
     function showCelebrationPopup() {
       const modal = document.getElementById("celebration-modal");
       const image = document.getElementById("celebration-image");
       const closeButton = document.getElementById("celebration-close");
-      const index = Math.floor(Math.random() * CELEBRATION_IMAGES.length);
+      const title = document.getElementById("celebration-title");
+      const index = getCelebrationImageIndexForDate();
       image.src = CELEBRATION_IMAGES[index];
+      title.textContent = getCelebrationTitle();
+      closeButton.textContent = "Close";
       modal.classList.add("open");
 
       function closeModal() {
@@ -1195,9 +1219,20 @@
     }
 
     function handleInput(raw) {
-      if (gameOver) return;
-
       const key = raw.toUpperCase();
+
+      if (gameOver) {
+        if (key === "ENTER") {
+          const lastGuess = guesses[guesses.length - 1] || "";
+          if (lastGuess === solution) {
+            const modal = document.getElementById("celebration-modal");
+            if (!modal.classList.contains("open")) {
+              showCelebrationPopup();
+            }
+          }
+        }
+        return;
+      }
 
       if (key === "ENTER") {
         submitGuess();
