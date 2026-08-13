@@ -269,6 +269,20 @@
       cursor: pointer;
     }
 
+    .modal-definition {
+      background: #003366;
+    }
+
+    .modal-definition:hover {
+      background: #00254d;
+    }
+
+    .modal-definition:active {
+      background: #001a33;
+    }
+      margin-top: 1rem;
+    }
+
     @media (max-width: 420px) {
       .app {
         padding: 0.425rem 0.65rem 1rem;
@@ -355,7 +369,10 @@
       <img id="celebration-image" alt="Celebration cat picture" src="" />
       <div class="modal-body">
         <h2 id="celebration-title">Congratulations!</h2>
-        <button type="button" class="modal-close" id="celebration-close">Nice!</button>
+        <div class="modal-buttons">
+          <button type="button" class="modal-close modal-definition" id="celebration-definition" title="Lookup this word in the Oxford English Dictionary">Dictionary</button>
+          <button type="button" class="modal-close" id="celebration-close">Nice!</button>
+        </div>
       </div>
     </div>
   </div>
@@ -975,11 +992,15 @@
       const modal = document.getElementById("celebration-modal");
       const image = document.getElementById("celebration-image");
       const closeButton = document.getElementById("celebration-close");
+      const definitionButton = document.getElementById("celebration-definition");
       const title = document.getElementById("celebration-title");
       const index = getCelebrationImageIndexForDate();
       image.src = CELEBRATION_IMAGES[index];
       title.textContent = getCelebrationTitle();
       closeButton.textContent = "Close";
+      definitionButton.onclick = () => {
+        window.open(`https://www.oed.com/search/dictionary/?scope=Entries&q=${solution.toLowerCase()}`, "_blank", "noopener,noreferrer");
+      };
       modal.classList.add("open");
 
       function closeModal() {
